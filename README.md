@@ -70,7 +70,7 @@ Stitchtly is a **Textile Inventory Management Application** built to utilize **L
 
 If you want to use the mobile app to scan barcodes to update inventory, you can download the app from here (for now, only Android is supported):
 
-- [Stitchtly-BarScanner Web App](https://expo.dev/accounts/jorgechvz98/projects/stitchtly-barscanner/builds/683545fb-a67b-443d-9975-231ca283102e)
+- [Stitchtly BarScanner Android App](https://expo.dev/accounts/jorgechvz98/projects/stitchtly-barscanner/builds/683545fb-a67b-443d-9975-231ca283102e)
 
 --- 
 
