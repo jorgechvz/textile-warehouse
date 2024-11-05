@@ -1,8 +1,8 @@
-# Textile Inventory Management App using LoRaWAN Network
+# Stitchtly App using LoRaWAN Network
 
 ## Overview
 
-This is a **Textile Inventory Management Application** built to utilize **LoRaWAN (Long Range Wide Area Network)** for product tracking and monitoring. The app allows users to manage product inventories, monitor stock levels, and receive notifications when stock runs low. It integrates a LoRaWAN network for transmitting data from physical product scanners to a gateway, which then forwards the information to the LoRa server. The application communicates with the LoRa server via an API to retrieve and update stock data in real-time.
+Stitchtly is a **Textile Inventory Management Application** built to utilize **LoRaWAN (Long Range Wide Area Network)** for product tracking and monitoring. The app allows users to manage product inventories, monitor stock levels, and receive notifications when stock runs low. It integrates a LoRaWAN network for transmitting data from physical product scanners to a gateway, which then forwards the information to the LoRa server. The application communicates with the LoRa server via an API to retrieve and update stock data in real-time.
 
 ### Key Features:
 
@@ -55,6 +55,12 @@ This is a **Textile Inventory Management Application** built to utilize **LoRaWA
 - **Email Notifications**: Automatic email alerts when stock levels reach the minimum threshold.
 - **LoRa Server Integration**: Fetch real-time scan data from the LoRa server API to update stock.
 - **Reports and Analytics**: Generate reports on inventory status, product movements, and low stock trends.
+
+## Bar code scanner mobile app
+
+If you want to use the mobile app to scan barcodes to update inventory, you can download the app from here (for now, only Android is supported):
+
+- [Stitchtly-BarScanner Web App](https://expo.dev/accounts/jorgechvz98/projects/stitchtly-barscanner/builds/683545fb-a67b-443d-9975-231ca283102e)
 
 ## Getting Started
 
@@ -109,8 +115,7 @@ Ensure you have the following environment variables configured:
 ### Future Enhancements
 
 - Detailed Analytics: Visualize inventory trends and generate predictive analytics.
-- Mobile Support: Develop a mobile app version for on-the-go inventory management.
-- Barcode Integration: Add support for barcode scanning for faster product updates.
+- Chatbot Integration: Allow customers to communicate with the app through a chatbot.
 
 ### License
 
