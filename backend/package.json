@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "json-server": "^0.17.0",
