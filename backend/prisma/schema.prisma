@@ -1,0 +1,113 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Models for User Management
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+  role          UserRole       @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+  auditLogs     AuditLog[]
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  createdAt DateTime @default(now())
+}
+
+// Models for Inventory Management
+
+model Product {
+  id               String            @id @default(cuid())
+  name             String
+  description      String?
+  sku              String            @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  category         Category          @relation(fields: [categoryId], references: [id])
+  categoryId       String
+  inventoryItems   InventoryItem[]
+  productionOrders ProductionOrder[]
+  suppliers        Supplier[]
+}
+
+model InventoryItem {
+  id          String          @id @default(cuid())
+  product     Product         @relation(fields: [productId], references: [id])
+  productId   String
+  location    String?
+  stock       Int
+  status      InventoryStatus
+  lastUpdated DateTime        @updatedAt
+}
+
+model ProductionOrder {
+  id        String      @id @default(cuid())
+  product   Product     @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  status    OrderStatus
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  products Product[]
+}
+
+model Supplier {
+  id          String    @id @default(cuid())
+  name        String
+  contactInfo String?
+  email       String    @unique
+  phoneNumber String?
+  address     String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Enums for User Management and Inventory Management
+
+enum InventoryStatus {
+  EN_STOCK
+  BAJO_STOCK
+  AGOTADO
+}
+
+enum OrderStatus {
+  PENDIENTE
+  PROCESADO
+  COMPLETADO
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
