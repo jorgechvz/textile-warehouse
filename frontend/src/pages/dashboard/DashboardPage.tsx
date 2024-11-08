@@ -1,13 +1,47 @@
-import { MainNav } from "@/components/dashboard/components/main-nav";
-import { Overview } from "@/components/dashboard/components/overview";
-import { RecentSales } from "@/components/dashboard/components/recent-sales";
-import { Search } from "@/components/dashboard/components/search-bar";
+import { InventoryItem, ProductionOrder } from "@/api/dashboard.api";
+import { InventoryStatusChart } from "@/components/dashboard/components/overview/inventory-status-chart";
+import KPICard from "@/components/dashboard/components/kpi-cards";
 import { Spinner } from "@/components/dashboard/components/spinner";
-import { StatsCards } from "@/components/dashboard/components/stats-card";
-import { UserNav } from "@/components/dashboard/components/user-nav";
 import { useDashboardData } from "@/components/dashboard/hooks/get-dashboard";
+import {
+  lowStockAlerts,
+  orderStatusData,
+  recentOrders,
+  salesData,
+  topSellingProducts,
+} from "@/components/dashboard/utils/utils";
+import Layout from "@/components/layout/layout";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AlertCircle,
+  BarChart2,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export function DashboardPage() {
   const { productsQuery, productionOrdersQuery, inventoryQuery } =
@@ -28,69 +62,180 @@ export function DashboardPage() {
   ) {
     return <div>Error loading dashboard data</div>;
   }
-
+  const kpiData = {
+    totalProducts: productsQuery.data?.length,
+    lowStockProducts: inventoryQuery.data?.filter(
+      (item: InventoryItem) => item.status === "LOW_STOCK"
+    ).length,
+    totalOrders: productionOrdersQuery.data?.length,
+    pendingOrders: productionOrdersQuery.data?.filter(
+      (order: ProductionOrder) => order.status === "PENDING"
+    ).length,
+    salesToday: 0,
+    revenueThisMonth: 0,
+  };
   return (
-    <>
-      <div className="hidden flex-col md:flex">
-        <div className="border-b">
-          <div className="flex h-16 items-center px-4">
-            <MainNav />
-            <div className="ml-auto flex items-center space-x-4">
-              <Search />
-              <UserNav />
-            </div>
-          </div>
+    <Layout>
+      <div className="space-y-10 mt-4 px-8">
+        <div className="flex items-center">
+          <h2 className="text-3xl font-bold">Overview</h2>
+          <Button className="ml-auto">
+            <BarChart2 className="mr-2 h-4 w-4" />
+            Generate Report
+          </Button>
         </div>
-        <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            {/* <div className="flex items-center space-x-2">
-              <CalendarDateRangePicker />
-              <button className="btn btn-primary">Download</button>
-            </div> */}
-          </div>
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="analytics" disabled>
-                Analytics
-              </TabsTrigger>
-              <TabsTrigger value="reports" disabled>
-                Reports
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled>
-                Notifications
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <StatsCards products={productsQuery.data || []} />
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                  <CardHeader>
-                    <CardTitle>Overview</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pl-2">
-                    <Overview orders={productionOrdersQuery.data || []} />
-                  </CardContent>
-                </Card>
-                <Card className="col-span-3">
-                  <CardHeader>
-                    <CardTitle>Pedidos Recientes</CardTitle>
-                    <p className="text-muted-foreground">
-                      You made 265 sales this month.
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <RecentSales sales={productionOrdersQuery.data || []} />
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KPICard
+            title="Total Products"
+            value={kpiData.totalProducts}
+            icon={<Package className="h-4 w-4 text-muted-foreground" />}
+          />
+          <KPICard
+            title="Low Stock Products"
+            value={kpiData.lowStockProducts}
+            icon={<AlertCircle className="h-4 w-4 text-muted-foreground" />}
+          />
+          <KPICard
+            title="Total Orders"
+            value={kpiData.totalOrders}
+            icon={<ShoppingCart className="h-4 w-4 text-muted-foreground" />}
+          />
+          <KPICard
+            title="Pending Orders"
+            value={kpiData.pendingOrders}
+            icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          />
+          <KPICard
+            title="Sales Today"
+            value={`$${kpiData.salesToday}`}
+            icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+          />
+          <KPICard
+            title="Revenue This Month"
+            value={`$${kpiData.revenueThisMonth}`}
+            icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
+          />
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <InventoryStatusChart />
+          <Card>
+            <CardHeader>
+              <CardTitle>Sales Trends</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={salesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="sales" stroke="#8884d8" />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Orders by Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={orderStatusData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Selling Products</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart layout="vertical" data={topSellingProducts}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="sales" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Orders</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentOrders.map((order) => (
+                    <TableRow key={order.id}>
+                      <TableCell>{order.id}</TableCell>
+                      <TableCell>{order.customer}</TableCell>
+                      <TableCell>{order.date}</TableCell>
+                      <TableCell>{order.status}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Low Stock Alerts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Current Stock</TableHead>
+                    <TableHead>Min Stock</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lowStockAlerts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>{product.id}</TableCell>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell>{product.currentStock}</TableCell>
+                      <TableCell>{product.minStock}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </>
+    </Layout>
   );
 }

@@ -1,12 +1,11 @@
 import { ProductionOrder } from "@/api/dashboard.api";
-import React from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 interface OverviewProps {
   orders: ProductionOrder[];
 }
 
-export const Overview: React.FC<OverviewProps> = ({ orders }) => {
+export const Overview = ({ orders }: OverviewProps) => {
   const data = orders.map((order) => ({
     name: order.product,
     quantity: order.quantity,

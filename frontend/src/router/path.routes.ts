@@ -3,7 +3,10 @@ export const Paths = {
     LOGIN: "/",
   },
   app: {
-    DASHBOARD: "/dashboard",
+    DASHBOARD: "dashboard/overview",
+    ANALYTICS: "dashboard/analytics",
+    INVENTORY: "inventory/view",
+    PRODUCTS: "products/all",
     /* PERFIL: "/app/perfil",
     COTIZACIONES_NUEVA: "/app/cotizaciones/nueva",
     COTIZACIONES_DETALLE: "/app/cotizaciones/detalle/:id",

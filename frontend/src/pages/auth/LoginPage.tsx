@@ -34,7 +34,7 @@ export function LoginPage() {
         </Link> */}
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
           <div className="absolute inset-0 bg-login-cover bg-cover bg-center" />
-          <div className="relative z-20 mt-auto text-3xl font-bold">Textile Warehouse</div>
+          <div className="relative z-20 mt-auto text-3xl font-bold">Stitchtly</div>
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
