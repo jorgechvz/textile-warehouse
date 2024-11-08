@@ -12,9 +12,6 @@ import { join } from 'path';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'), 
-    }),
     AuthModule,
     UsersModule,
     ProductsModule,
