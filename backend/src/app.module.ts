@@ -7,6 +7,7 @@ import { CategoryModule } from './category/category.module';
 import { ProductionOrderModule } from './production-order/production-order.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { WarehouseLocationModule } from './warehouse-location/warehouse-location.module';
+import { WarehouseManagerModule } from './warehouse-manager/warehouse-manager.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WarehouseLocationModule } from './warehouse-location/warehouse-location
     ProductionOrderModule,
     SupplierModule,
     WarehouseLocationModule,
+    WarehouseManagerModule,
   ],
 })
 export class AppModule {}
