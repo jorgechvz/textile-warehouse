@@ -25,7 +25,10 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: CategoryEntity, description: 'Create a category' })
+  @ApiCreatedResponse({
+    type: CategoryEntity,
+    description: 'Create a category',
+  })
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     return new CategoryEntity(
       await this.categoryService.create(createCategoryDto),
@@ -34,8 +37,9 @@ export class CategoryController {
 
   @Get()
   @ApiOkResponse({ type: [CategoryEntity], description: 'List of categories' })
-  findAll() {
-    return this.categoryService.findAll();
+  async findAll() {
+    const categories = await this.categoryService.findAll();
+    return categories.map((category) => new CategoryEntity(category));
   }
 
   @Get(':id')
@@ -43,26 +47,28 @@ export class CategoryController {
     type: CategoryEntity,
     description: 'Find a category by id with products',
   })
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findCategoryById(id);
+  async findOne(@Param('id') id: string) {
+    return new CategoryEntity(await this.categoryService.findCategoryById(id));
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: CategoryEntity })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return new CategoryEntity(
+      await this.categoryService.update(id, updateCategoryDto),
+    );
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: CategoryEntity })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(id);
+  async remove(@Param('id') id: string) {
+    return new CategoryEntity(await this.categoryService.remove(id));
   }
 }
