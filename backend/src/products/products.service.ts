@@ -34,7 +34,11 @@ export class ProductsService {
   findAll() {
     return this.prisma.product.findMany({
       include: {
-        inventoryManagement: true,
+        inventoryManagement: {
+          include: {
+            warehouseLocation: true,
+          },
+        },
         category: true,
       },
     });
@@ -80,7 +84,10 @@ export class ProductsService {
     const inventoryItems = await this.prisma.inventoryItem.findMany({
       where: { productId: id },
     });
-    const newTotalStock = inventoryItems.reduce((sum, item) => sum + item.stock, 0);
+    const newTotalStock = inventoryItems.reduce(
+      (sum, item) => sum + item.stock,
+      0,
+    );
 
     return this.prisma.product.update({
       where: { id },
@@ -91,6 +98,38 @@ export class ProductsService {
     });
   }
 
+  async addStock(inventoryItemId: string, stock: number) {
+    const inventoryItem = await this.prisma.inventoryItem.findUnique({
+      where: { id: inventoryItemId },
+    });
+    if (!inventoryItem) {
+      throw new Error('Inventory item not found');
+    }
+    const newStock = inventoryItem.stock + stock;
+    return this.prisma.inventoryItem.update({
+      where: { id: inventoryItemId },
+      data: { stock: newStock },
+    });
+  }
+  async removeStock(inventoryId: string, stock: number) {
+    const inventoryItem = await this.prisma.inventoryItem.findUnique({
+      where: { id: inventoryId },
+    });
+    if (!inventoryItem) {
+      throw new Error('Inventory item not found');
+    }
+    const newStock = inventoryItem.stock - stock;
+    return this.prisma.inventoryItem.update({
+      where: { id: inventoryId },
+      data: { stock: newStock },
+    });
+  }
+
+  async getInventoryItem(id: string) {
+    return this.prisma.inventoryItem.findUnique({
+      where: { id },
+    });
+  }
   async remove(id: string) {
     await this.prisma.inventoryItem.deleteMany({
       where: { productId: id },
