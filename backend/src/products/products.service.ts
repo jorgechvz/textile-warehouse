@@ -7,22 +7,34 @@ import { PrismaService } from 'src/prisma.service';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
   async create(createProductDto: CreateProductDto) {
-    const { inventoryItems, ...productData } = createProductDto;
+    const { inventoryManagement, ...productData } = createProductDto;
+
     const product = await this.prisma.product.create({
       data: {
         ...productData,
-        inventoryItems: {
-          create: inventoryItems,
+        totalStock: inventoryManagement.reduce(
+          (sum, item) => sum + item.stock,
+          0,
+        ),
+        inventoryManagement: {
+          create: inventoryManagement.map((item) => ({
+            stock: item.stock,
+            status: item.status,
+            warehouseLocation: { connect: { id: item.locationId } },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })),
         },
       },
     });
+
     return product;
   }
 
   findAll() {
     return this.prisma.product.findMany({
       include: {
-        inventoryItems: true,
+        inventoryManagement: true,
         category: true,
       },
     });
@@ -32,26 +44,57 @@ export class ProductsService {
     return this.prisma.product.findUnique({
       where: { id },
       include: {
-        inventoryItems: true,
+        inventoryManagement: true,
         category: true,
       },
     });
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const { inventoryItems, ...productData } = updateProductDto;
-    return await this.prisma.product.update({
+    const { inventoryManagement, ...productData } = updateProductDto;
+
+    for (const item of inventoryManagement) {
+      await this.prisma.inventoryItem.upsert({
+        where: {
+          productId_locationId: {
+            productId: id,
+            locationId: item.locationId,
+          },
+        },
+        update: {
+          stock: item.stock,
+          status: item.status,
+          updatedAt: new Date(),
+        },
+        create: {
+          product: { connect: { id } },
+          stock: item.stock,
+          status: item.status,
+          warehouseLocation: { connect: { id: item.locationId } },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    const inventoryItems = await this.prisma.inventoryItem.findMany({
+      where: { productId: id },
+    });
+    const newTotalStock = inventoryItems.reduce((sum, item) => sum + item.stock, 0);
+
+    return this.prisma.product.update({
       where: { id },
       data: {
         ...productData,
-        inventoryItems: {
-          create: inventoryItems,
-        },
+        totalStock: newTotalStock,
       },
     });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
+    await this.prisma.inventoryItem.deleteMany({
+      where: { productId: id },
+    });
     return this.prisma.product.delete({
       where: { id },
     });
