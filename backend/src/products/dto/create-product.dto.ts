@@ -52,3 +52,12 @@ export class CreateProductDto {
   @IsNotEmpty()
   categoryId: string;
 }
+
+export class AddStockDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  stock: number;
+}
+
+export class ReduceStockDto extends AddStockDto {}
