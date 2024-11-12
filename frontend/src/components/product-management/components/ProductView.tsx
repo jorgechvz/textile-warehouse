@@ -17,119 +17,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Pencil, Trash2, Eye, Plus } from "lucide-react";
-
-// Datos de ejemplo
-const productsData = [
-  {
-    id: 1,
-    name: "Tela de Algodón",
-    category: "Tela",
-    price: 10.99,
-    stock: 500,
-    status: "En Stock",
-    lastUpdated: "2023-06-20",
-  },
-  {
-    id: 2,
-    name: "Botones Metálicos",
-    category: "Accesorio",
-    price: 0.5,
-    stock: 1000,
-    status: "En Stock",
-    lastUpdated: "2023-06-19",
-  },
-  {
-    id: 3,
-    name: "Hilo de Seda",
-    category: "Hilo",
-    price: 5.99,
-    stock: 200,
-    status: "Bajo Stock",
-    lastUpdated: "2023-06-18",
-  },
-  {
-    id: 4,
-    name: "Cierres de Plástico",
-    category: "Accesorio",
-    price: 1.5,
-    stock: 0,
-    status: "Agotado",
-    lastUpdated: "2023-06-17",
-  },
-  {
-    id: 5,
-    name: "Tela de Poliéster",
-    category: "Tela",
-    price: 8.99,
-    stock: 300,
-    status: "En Stock",
-    lastUpdated: "2023-06-16",
-  },
-];
-
-const lowStockProducts = productsData.filter(
-  (product) => product.status === "Bajo Stock" || product.status === "Agotado"
-);
+import { Pencil, Trash2, Eye } from "lucide-react";
+import { useInventory } from "@/components/inventory/hooks/use-inventory";
+import ProductModal from "./ProductModal";
+import { useCategory } from "@/components/category/hooks/use-category";
 
 const ProductsView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [sortBy, setSortBy] = useState("");
 
-  const filteredProducts = productsData.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (categoryFilter === "" || item.category === categoryFilter) &&
-      (statusFilter === "" || item.status === statusFilter)
+  const { productsQuery } = useInventory();
+
+  const { data: products } = productsQuery;
+
+  const { queryCategories } = useCategory();
+
+  const filteredProducts = products?.filter((item) =>
+    categoryFilter === "all" || categoryFilter === ""
+      ? item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      : item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        item.category.name === categoryFilter
   );
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === "name") return a.name.localeCompare(b.name);
-    if (sortBy === "price") return a.price - b.price;
-    if (sortBy === "stock") return a.stock - b.stock;
-    return 0;
-  });
+  const sortedProducts = filteredProducts
+    ? [...filteredProducts].sort((a, b) => {
+        if (sortBy === "all") return 0;
+        if (sortBy === "name") return a.name.localeCompare(b.name);
+        if (sortBy === "stock")
+          return (a.totalStock ?? 0) - (b.totalStock ?? 0);
+        return 0;
+      })
+    : [];
 
-  const handleEdit = (id: number) => {
+  const handleEdit = (id: string) => {
     console.log(`Editing product with id: ${id}`);
     // Implementar lógica de edición
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => {
     console.log(`Deleting product with id: ${id}`);
     // Implementar lógica de eliminación
   };
 
-  const handleViewDetails = (id: number) => {
+  const handleViewDetails = (id: string) => {
     console.log(`Viewing details of product with id: ${id}`);
     // Implementar lógica para ver detalles
   };
 
-  const handleAddProduct = (productData: any) => {
-    console.log("Adding new product:", productData);
-    // Implementar lógica para agregar producto
-  };
-
-  const handleReorder = (id: number) => {
-    console.log(`Reordering product with id: ${id}`);
-    // Implementar lógica de reabastecimiento
-  };
-
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Products Management</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Products Management</h1>
+        <ProductModal />
+      </div>
 
       {/* All Products */}
       <Card>
@@ -151,20 +92,11 @@ const ProductsView = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="Tela">Tela</SelectItem>
-                  <SelectItem value="Accesorio">Accesorio</SelectItem>
-                  <SelectItem value="Hilo">Hilo</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="En Stock">En Stock</SelectItem>
-                  <SelectItem value="Bajo Stock">Bajo Stock</SelectItem>
-                  <SelectItem value="Agotado">Agotado</SelectItem>
+                  {queryCategories?.data?.map((category) => (
+                    <SelectItem key={category.id} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={setSortBy}>
@@ -174,7 +106,6 @@ const ProductsView = () => {
                 <SelectContent>
                   <SelectItem value="all">Default</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
-                  <SelectItem value="price">Price</SelectItem>
                   <SelectItem value="stock">Stock</SelectItem>
                 </SelectContent>
               </Select>
@@ -183,12 +114,10 @@ const ProductsView = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product ID</TableHead>
+                <TableHead>Sku</TableHead>
                 <TableHead>Product Name</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
                 <TableHead>Stock Level</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Last Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -196,138 +125,37 @@ const ProductsView = () => {
             <TableBody>
               {sortedProducts.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.id}</TableCell>
+                  <TableCell>{item.sku}</TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell>${item.price.toFixed(2)}</TableCell>
-                  <TableCell>{item.stock}</TableCell>
-                  <TableCell>{item.status}</TableCell>
-                  <TableCell>{item.lastUpdated}</TableCell>
+                  <TableCell>{item.category.name}</TableCell>
+                  <TableCell>{item.totalStock}</TableCell>
+                  <TableCell>
+                    {new Date(item.updatedAt || "").toLocaleString()}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleEdit(item.id)}
+                        onClick={() => handleEdit(item.id as string)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(item.id)}
+                        onClick={() => handleDelete(item.id as string)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleViewDetails(item.id)}
+                        onClick={() => handleViewDetails(item.id as string)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Add Product */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Add New Product</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Add Product
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Product</DialogTitle>
-                <DialogDescription>
-                  Enter the details of the new product you want to add.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input id="name" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="category" className="text-right">
-                    Category
-                  </Label>
-                  <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Tela">Tela</SelectItem>
-                      <SelectItem value="Accesorio">Accesorio</SelectItem>
-                      <SelectItem value="Hilo">Hilo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="price" className="text-right">
-                    Price
-                  </Label>
-                  <Input id="price" type="number" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="stock" className="text-right">
-                    Initial Stock
-                  </Label>
-                  <Input id="stock" type="number" className="col-span-3" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" onClick={() => handleAddProduct({})}>
-                  Add Product
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </CardContent>
-      </Card>
-
-      {/* Low Stock */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Low Stock Products</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Stock Level</TableHead>
-                <TableHead>Reorder Threshold</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {lowStockProducts.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell>{item.stock}</TableCell>
-                  <TableCell>
-                    {item.status === "Bajo Stock" ? item.stock + 50 : 100}
-                  </TableCell>
-                  <TableCell>
-                    <Button size="sm" onClick={() => handleReorder(item.id)}>
-                      Reorder
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

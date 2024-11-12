@@ -1,17 +1,10 @@
+import { Product } from "@/components/inventory/types/inventory.types";
 import axios from "axios";
 
-const API_URL = "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Tipos de datos
-export interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  stock: number;
-  price: number;
-  createdAt: string;
-  updatedAt: string;
-}
+
 
 export interface ProductionOrder {
   id: string;
@@ -33,6 +26,7 @@ export interface InventoryItem {
 
 export const fetchProducts = async () => {
   const { data } = await axios.get<Product[]>(`${API_URL}/products`);
+  console.log(data);
   return data;
 };
 // Hook para manejar los datos

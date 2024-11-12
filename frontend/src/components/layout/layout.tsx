@@ -72,7 +72,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <Search />
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</main>
+        <main className="flex flex-1 flex-col gap-4 p-12 pt-0">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );
