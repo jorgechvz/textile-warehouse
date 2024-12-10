@@ -49,7 +49,7 @@ export default function ProductModal() {
   });
 
   const { queryCategories } = useCategory();
-  const { queryWarehouseLocations } = useWarehouse();
+  const { queryWarehouses } = useWarehouse();
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -212,7 +212,7 @@ export default function ProductModal() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {queryWarehouseLocations.data?.map(
+                                {queryWarehouses.data?.map(
                                   (location) => (
                                     <SelectItem
                                       key={location.id}

@@ -1,10 +1,10 @@
-import InventoryView from "@/components/inventory/components/inventory"
+import InventoryOverview from "@/components/inventory/components/inventory-overview"
 import Layout from "@/components/layout/layout"
 
 export const InventoryPage = () => {
   return (
     <Layout>
-        <InventoryView  />
+        <InventoryOverview  />
     </Layout>
   )
 }

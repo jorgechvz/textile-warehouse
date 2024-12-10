@@ -8,14 +8,14 @@ export function LoginPage() {
     <>
       <div className="md:hidden">
         <img
-          src="public/login-cover.jpg"
+          src="/login-cover.jpg"
           width={1280}
           height={843}
           alt="Authentication"
           className="block dark:hidden"
         />
         <img
-          src="public/login-cover.jpg"
+          src="/login-cover.jpg"
           width={1280}
           height={843}
           alt="Authentication"
@@ -39,6 +39,11 @@ export function LoginPage() {
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">
+              <img
+                src="/stitchly-logo2.svg"
+                alt="Stitchly"
+                className="h-20 w-20 self-center"
+              />
               <h1 className="text-2xl font-semibold tracking-tight">
                 Iniciar sesión
               </h1>

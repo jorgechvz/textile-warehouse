@@ -8,6 +8,32 @@ import {
 } from "@/api/product.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Product } from "../types/inventory.types";
+import {
+  fetchInventoryItemsByLocationId,
+  fetchInventoryOverviewByWarehouseId,
+} from "@/api/inventory.api";
+
+export const useInventoryItems = (
+  warehouseId: string,
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  const inventoryOverviewByWarehouseIdQuery = useQuery({
+    queryKey: ["inventoryOverviewByWarehouseId", warehouseId],
+    queryFn: () => fetchInventoryOverviewByWarehouseId(warehouseId),
+  });
+
+  const inventoryItemsByWarehouseIdQuery = useQuery({
+    queryKey: ["inventoryItemsByWarehouseId", warehouseId, page, pageSize],
+    queryFn: () => fetchInventoryItemsByLocationId(warehouseId, page, pageSize),
+    placeholderData: (previousData, _) => previousData,
+  });
+
+  return {
+    inventoryOverviewByWarehouseIdQuery,
+    inventoryItemsByWarehouseIdQuery,
+  };
+};
 
 export const useInventory = () => {
   const queryClient = useQueryClient();
@@ -16,7 +42,6 @@ export const useInventory = () => {
     queryKey: ["products"],
     queryFn: fetchProducts,
   });
-
   const addProductMutation = useMutation({
     mutationFn: async (product: Omit<Product, "id">) => {
       return await createProduct(product);

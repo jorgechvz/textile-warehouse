@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {  useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, LoginType } from "../types/login-type";
 import {
@@ -11,11 +11,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOff, Mail } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
 
 export default function LoginForm() {
   const { loginMutation } = useAuth();
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
@@ -25,15 +26,23 @@ export default function LoginForm() {
     },
   });
   const onSubmit = (data: LoginType) => {
-   loginMutation.mutate(data);
-
+    loginMutation.mutate(data, {
+      onError: (error: any) => {
+        const message =
+          error.response?.data?.message || "An unexpected error occurred";
+          setError(message); 
+      },
+    });
   };
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col items-center justify-center gap-y-4" 
+        className="flex flex-col items-center justify-center gap-y-4"
       >
+        {error && (
+          <div className="text-red-500 text-sm text-center font-semibold">{error}</div>
+        )}
         <FormField
           control={form.control}
           name="email"
@@ -41,11 +50,19 @@ export default function LoginForm() {
             <FormItem className="w-full">
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="email"
-                  placeholder="Ingrese su correo"
-                />
+                <div className="relative">
+                  <Input
+                    id="input-10"
+                    {...field}
+                    className="peer pe-9"
+                    placeholder="Ingrese su correo"
+                    type="email"
+                    autoComplete="email"
+                  />
+                  <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-muted-foreground/80 peer-disabled:opacity-50">
+                    <Mail size={16} strokeWidth={2} aria-hidden="true" />
+                  </div>
+                </div>
               </FormControl>
             </FormItem>
           )}
@@ -58,7 +75,11 @@ export default function LoginForm() {
               <FormLabel>Contraseña</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <Input {...field} type={showPassword ? "text" : "password"}  className=""/>
+                  <Input
+                    {...field}
+                    type={showPassword ? "text" : "password"}
+                    className=""
+                  />
                   <Button
                     type="button"
                     variant={"ghost"}
@@ -77,7 +98,9 @@ export default function LoginForm() {
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit">Submit</Button>
+        <Button className="w-full" type="submit">
+          Login
+        </Button>
       </form>
     </Form>
   );

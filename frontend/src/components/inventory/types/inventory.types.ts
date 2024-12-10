@@ -23,6 +23,7 @@ export type Product = {
   totalStock?: number;
   categoryId: string;
   category: Category;
+  createdAt?: Date;
   updatedAt?: Date;
   inventoryManagement: InventoryItem[];
   productionOrders?: ProductionOrder[];
@@ -35,8 +36,23 @@ export type InventoryItem = {
   stock: number;
   locationId: string;
   status: InventoryStatus;
-  createdA?: Date;
-  updatedA?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type InventoryItemsByLocationId = {
+  id?: string;
+  stock: number;
+  status: InventoryStatus;
+  updatedAt?: Date;
+  product: Product;
+};
+
+
+export type InventoryOverview = {
+  total: number;
+  lowStock: number;
+  outOfStock: number;
 };
 
 export type WarehouseLocation = {

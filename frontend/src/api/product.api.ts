@@ -1,5 +1,7 @@
 import { getTokenFromLocalStorage } from "@/components/auth/utils/utils";
-import { Product } from "@/components/inventory/types/inventory.types";
+import {
+  Product,
+} from "@/components/inventory/types/inventory.types";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;

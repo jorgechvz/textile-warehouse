@@ -9,11 +9,17 @@ export const useAuth = () => {
     mutationFn: loginRequest,
     onSuccess: (data) => {
       saveUserToLocalStorage(data.accessToken);
-      navigate("/dashboard/overview");
-    },
-    onError: (error) => {
-      console.log(error);
+      navigate("/dashboard");
     },
   });
-  return { loginMutation };
+
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    navigate("/");
+  };
+
+  const isAuthenticated = () => {
+    return !!localStorage.getItem("access_token");
+  };
+  return { loginMutation, logout, isAuthenticated };
 };

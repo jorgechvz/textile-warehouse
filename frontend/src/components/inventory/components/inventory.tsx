@@ -44,6 +44,7 @@ import {
   Eye,
   Plus,
 } from "lucide-react";
+import InventoryOverview from "./inventory-overview";
 
 // Datos de ejemplo
 const inventoryData = [
@@ -159,7 +160,7 @@ const InventoryView = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Inventory Management</h1>
-
+      <InventoryOverview />
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>

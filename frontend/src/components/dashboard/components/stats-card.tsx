@@ -1,4 +1,4 @@
-import { Product } from "@/api/dashboard.api";
+import { Product } from "@/components/inventory/types/inventory.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 
@@ -12,10 +12,12 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ products }) => {
       {products.map((product) => (
         <Card key={product.id}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{product.name}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {product.name}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{product.stock} units</div>
+            <div className="text-2xl font-bold">{product.totalStock} units</div>
             <div className="text-sm text-muted-foreground">in stock</div>
           </CardContent>
         </Card>

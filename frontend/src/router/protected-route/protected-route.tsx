@@ -1,4 +1,4 @@
-/* import { useAuthStore } from "@/context/auth";
+import { useAuth } from "@/components/auth/hooks/use-auth";
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
@@ -10,10 +10,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   redirectTo = "/",
 }) => {
-  const { user } = useAuthStore();
-  if (!user) return <Navigate to={redirectTo} replace />;
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated()) return <Navigate to={redirectTo} replace />;
   return children ?? <Outlet />;
 };
 
 export default ProtectedRoute;
- */
