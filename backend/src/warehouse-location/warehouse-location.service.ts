@@ -41,4 +41,8 @@ export class WarehouseLocationService {
       },
     });
   }
+
+  findWarehouseCount() {
+    return this.prisma.warehouseLocation.count();
+  }
 }

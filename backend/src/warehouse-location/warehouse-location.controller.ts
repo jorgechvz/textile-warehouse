@@ -50,6 +50,15 @@ export class WarehouseLocationController {
     );
   }
 
+  @Get('count')
+  @ApiOkResponse({
+    type: Number,
+    description: 'Get the number of warehouse locations',
+  })
+  async findWarehouseCount() {
+    return await this.warehouseLocationService.findWarehouseCount();
+  }
+
   @Get(':id')
   @ApiOkResponse({
     type: WarehouseLocationEntity,

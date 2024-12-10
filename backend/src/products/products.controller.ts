@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import {
   AddStockDto,
   CreateProductDto,
+  ProductStockBySkuAndLocationDto,
   ReduceStockDto,
 } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -19,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -44,10 +47,76 @@ export class ProductsController {
     return products.map((product) => new ProductEntity(product));
   }
 
+  @Get('all')
+  @ApiOkResponse({
+    type: [ProductEntity],
+    description: 'List of products with pagination',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Page size (default: 10)',
+  })
+  async findAllWithPagination(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    const currentPage = page ? parseInt(page, 10) : 1;
+    const size = pageSize ? parseInt(pageSize, 10) : 10;
+
+    return this.productsService.findAllWithPagination(currentPage, size);
+  }
+
   @Get(':id')
   @ApiOkResponse({ type: ProductEntity, description: 'Find a product by id' })
   async findOne(@Param('id') id: string) {
     return new ProductEntity(await this.productsService.findOne(id));
+  }
+
+  @Get('inventory/overview/:locationId')
+  @ApiOkResponse({
+    type: [ProductEntity],
+    description: 'Find inventory overview by location',
+  })
+  async findInventoryOverviewByLocation(
+    @Param('locationId') locationId: string,
+  ) {
+    return this.productsService.getInventoryOverviewByLocationId(locationId);
+  }
+
+  @Get('inventory/items/:locationId')
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Page size (default: 10)',
+  })
+  @ApiOkResponse({
+    type: [ProductEntity],
+    description: 'Find inventory items by location with optional pagination',
+  })
+  async findInventoryItemsByLocation(
+    @Param('locationId') locationId: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    const currentPage = page ? parseInt(page, 10) : 1;
+    const size = pageSize ? parseInt(pageSize, 10) : 10;
+
+    return this.productsService.getInventoryItemsByWarehouseId(
+      locationId,
+      currentPage,
+      size,
+    );
   }
 
   @Patch(':id')
@@ -60,6 +129,38 @@ export class ProductsController {
   ) {
     return new ProductEntity(
       await this.productsService.update(id, updateProductDto),
+    );
+  }
+
+  @Patch('inventory/add')
+  @ApiCreatedResponse({
+    type: ProductEntity,
+    description: 'Add stock using LoRa nodes',
+  })
+  async addStockBySkuAndLocation(
+    @Body() addStockBySkuAndLocationDto: ProductStockBySkuAndLocationDto,
+  ) {
+    return new ProductEntity(
+      await this.productsService.addStockBySkuAndLocation(
+        addStockBySkuAndLocationDto.sku,
+        addStockBySkuAndLocationDto.locationId,
+      ),
+    );
+  }
+
+  @Patch('inventory/remove')
+  @ApiCreatedResponse({
+    type: ProductEntity,
+    description: 'Reduce stock using LoRa nodes',
+  })
+  async removeStockBySkuAndLocation(
+    @Body() reduceStockBySkuAndLocationDto: ProductStockBySkuAndLocationDto,
+  ) {
+    return new ProductEntity(
+      await this.productsService.removeStockBySkuAndLocation(
+        reduceStockBySkuAndLocationDto.sku,
+        reduceStockBySkuAndLocationDto.locationId,
+      ),
     );
   }
 

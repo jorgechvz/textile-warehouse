@@ -61,3 +61,13 @@ export class AddStockDto {
 }
 
 export class ReduceStockDto extends AddStockDto {}
+
+export class ProductStockBySkuAndLocationDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  sku: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  locationId: string;
+}
